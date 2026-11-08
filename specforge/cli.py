@@ -28,12 +28,14 @@ import os
 import signal
 import socket
 from contextlib import contextmanager
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Iterator, Optional, Sequence
 
 import click
 
 from specforge.config import Config, load_config
+from specforge.inference.omni_capture import collect_omni_features
 
 
 class _WorkerTermination(BaseException):
@@ -269,6 +271,52 @@ def train(
             return 128 + received.signum
         return 0
     return run_commands(launch)
+
+
+@cli.command(
+    "capture", short_help="collect offline DSpark features from an Omni teacher"
+)
+@click.option(
+    "--worker-python", type=click.Path(exists=True, path_type=Path), required=True
+)
+@click.option(
+    "--worker-directory",
+    type=click.Path(exists=True, file_okay=False, path_type=Path),
+    required=True,
+)
+@click.option("--factory", required=True)
+@click.option(
+    "--worker-config", type=click.Path(exists=True, path_type=Path), required=True
+)
+@click.option("--inputs", type=click.Path(exists=True, path_type=Path), required=True)
+@click.option("--output", type=click.Path(path_type=Path), required=True)
+@click.option("--limit", type=click.IntRange(min=1), default=2)
+@click.option(
+    "--draft-config", type=click.Path(exists=True, path_type=Path), required=True
+)
+@click.option("--exclude-source", "excluded_sources", multiple=True)
+def capture(
+    worker_python: Path,
+    worker_directory: Path,
+    factory: str,
+    worker_config: Path,
+    inputs: Path,
+    output: Path,
+    limit: int,
+    draft_config: Path,
+    excluded_sources: tuple[str, ...],
+) -> None:
+    collect_omni_features(
+        worker_python=worker_python,
+        worker_directory=worker_directory,
+        factory=factory,
+        worker_config=worker_config,
+        inputs=inputs,
+        output=output,
+        limit=limit,
+        draft_config=draft_config,
+        excluded_sources=excluded_sources,
+    )
 
 
 @cli.command(short_help="materialize a runtime checkpoint as a model directory")
