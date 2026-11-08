@@ -1,0 +1,9 @@
+{
+  "model_path": "./checkpoints/ming-asr",
+  "model_revision": "ac95e7b1678c08ea6f4a2581a051e432ed63e9b7",
+  "runtime_revision": "391f4e6f175177571d8e5471daa684d1fcaf9c99",
+  "capture_layer_ids": [1, 6, 13, 17, 20],
+  "max_sequence_tokens": 4096,
+  "max_new_tokens": 512,
+  "device": "cuda:0"
+}

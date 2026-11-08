@@ -1,0 +1,32 @@
+model:
+  target_model_path: ./checkpoints/ming-asr
+  draft_model_config: configs/ming-3.0-asr-tiny-dspark.json
+  target_backend: sglang
+  trust_remote_code: false
+  embedding_key: model.word_embeddings.weight
+  lm_head_key: lm_head.weight
+  torch_dtype: bfloat16
+data:
+  hidden_states_path: ./cache/ming-asr
+  max_length: 4096
+  cache_dir: ./cache
+training:
+  strategy: dspark
+  num_epochs: 1
+  batch_size: 1
+  learning_rate: 3.0e-4
+  warmup_ratio: 0.04
+  max_grad_norm: 1.0
+  attention_backend: flex_attention
+  num_anchors: 16
+  save_interval: 1
+  log_interval: 1
+  dist_timeout: 30
+  seed: 42
+run_id: ming-asr-dspark-smoke
+output_dir: ./outputs/ming-asr-dspark-smoke
+deployment:
+  mode: local_colocated
+  trainer:
+    nnodes: 1
+    nproc_per_node: 1
